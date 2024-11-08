@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 export function Navbar() {
   return (
-    <div className="flex justify-between px-32 tracking-tight">
+    <div className="flex justify-between px-32 tracking-tight py-1">
       <Link to="/home" className="py-2">
         <img src="/icons/logo.svg" className="w-auto h-10" />
       </Link>

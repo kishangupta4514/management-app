@@ -116,10 +116,10 @@ export function LandingPage() {
                 <div className="absolute w-[750px] left-[10%] top-[10%]">
                   <img src="/shapes/Ellipse 20.svg" className="" />
                 </div>
-                <div className="absolute left-[10%] top-[70%]">
+                <div className="absolute left-[5%] top-[70%]">
                   <img src="/shapes/Ellipse 23.svg" className="h-[500px]" />
                 </div>
-                <div className="absolute w-[300px] left-[10%] top-[110%]">
+                <div className="absolute w-[300px] left-[5%] top-[110%]">
                   <img src="/shapes/Group 1.svg" className="" />
                 </div>
               </div>
@@ -129,23 +129,23 @@ export function LandingPage() {
                 <div className="absolute w-[300px] right-[2.5%]">
                   <img src="/icons/couple-with-keys.svg" />
                 </div>
-                <div className="absolute w-[380px]  right-[23%] top-[48%]">
+                <div className="absolute w-[380px]  right-[45%] top-[48%]">
                   <img src="/icons/person-with-home.svg" />
                 </div>
-                <div className="absolute w-[300px] right-[3%] top-[118%]">
+                <div className="absolute w-[300px] right-[6%] top-[118%]">
                   <img src="/icons/person-with-paper.svg" />
                 </div>
               </div>
               <div className="absolute w-[750px] right-[6%] -top-[20%] -rotate-[30deg]">
                 <img src="/shapes/Ellipse 7.svg" className="" />
               </div>
-              <div className="absolute right-[50%] top-[25%] -rotate-[30deg]">
+              <div className="absolute -left-[2%] top-[25%] -rotate-[30deg]">
                 <img src="/shapes/Ellipse 24.svg" className="" />
               </div>
-              <div className="absolute w-[750px] right-[9%] -bottom-[30%] -rotate-[30deg]">
+              <div className="absolute w-[750px] right-[11%] -bottom-[30%] -rotate-[30deg]">
                 <img src="/shapes/Ellipse 25.svg" className="" />
               </div>
-              <div className="absolute w-[750px] -right-[30%] -bottom-[113%] -rotate-[30deg]">
+              <div className="absolute w-[750px] -right-[30%] -bottom-[114%] -rotate-[30deg]">
                 <img src="/shapes/Ellipse 26.svg" className="" />
               </div>
             </div>
