@@ -67,6 +67,10 @@ export function LandingPage() {
     setProperyData(propertyData);
   };
 
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+  };
+
   useEffect(() => {
     fetchClientsData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,7 +306,7 @@ export function LandingPage() {
             ))}
           </div>
         </div>
-        <div className="flex w-full h-full items-center flex-col py-20">
+        <div className="flex w-full h-full items-center flex-col py-28">
           <div></div>
           <div className="text-3xl font-bold text-sky-700">Happy Clients</div>
           <div className="mt-16 flex gap-5 px-20">
@@ -311,10 +315,65 @@ export function LandingPage() {
             ))}
           </div>
         </div>
-        <div className="relative">
-          <div></div>
-          <div></div>
-          <div></div>
+        <div className="relative mt-28">
+          <div className="relative">
+            <div className="absolute w-full h-full bg-black bg-opacity-50">
+              <div className="w-[600px] mx-auto text-center text-2xl font-bold text-white mt-24">
+                Learn more about our listing process, as well as our additional
+                staging and design work.
+              </div>
+              <div className="text-center mt-16">
+                <button className="bg-white text-sky-500 rounded-lg mx-auto px-28 py-2 font-bold border-[1px] border-solid border-sky-500">Learn More</button>
+              </div>
+            </div>
+            <img className="" src="/icons/Rectangle.svg" />
+          </div>
+          <div className="w-full h-[100px] bg-blue-500 text-white flex justify-between px-28 items-center">
+            <div>Home</div>
+            <div>Services</div>
+            <div>Projects</div>
+            <div>Testimonials</div>
+            <div>Contact</div>
+            <div className="ml-32">Subscribe Us</div>
+            <form
+              onSubmit={handleSubscribe}
+              className=" border-2 border-white rounded-md"
+            >
+              <input
+                name="email"
+                placeholder="Enter Email Address"
+                className="placeholder-white outline-none text-white bg-inherit px-8"
+              />
+              <span>
+                <button
+                  className="bg-white text-sky-500 h-full p-2 px-8"
+                  type="submit"
+                >
+                  Subscribe
+                </button>
+              </span>
+            </form>
+          </div>
+          <div className="w-full h-[100px] bg-[#21202e] flex justify-between px-28 text-white items-center">
+            <div>All Rights Reserved 2024</div>
+            <div>
+              <img src="/icons/logo.svg" className="h-[40px]" />
+            </div>
+            <div className="flex gap-2">
+              <div className="rounded-full p-1 bg-white text-center m-auto">
+                <img src="/images/Group-1.svg" />
+              </div>
+              <div className="rounded-full p-1 bg-white">
+                <img src="/images/Group.svg" />
+              </div>
+              <div className="rounded-full p-1 bg-white">
+                <img src="/images/Frame.svg" />
+              </div>
+              <div className="rounded-full p-1 bg-white">
+                <img src="/images/Linkedin.svg" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
