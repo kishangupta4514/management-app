@@ -26,6 +26,7 @@ interface IClientData {
 export function LandingPage() {
   const [clientsData, setClientsData] = useState<IClientData[]>([]);
   const [propertyData, setProperyData] = useState<IProjectData[]>([]);
+  const [email, setEmail] = useState<string>("");
 
   const fetchClientsData = async () => {
     try {
@@ -54,8 +55,18 @@ export function LandingPage() {
     }
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await axios.post(`${apiUrl}/subscribe`, {
+        email,
+      });
+      alert("Subscribed...");
+      setEmail("");
+    } catch (error) {
+      alert("Failed to subscribe...");
+      console.error("Error subscribing:", error);
+    }
   };
 
   useEffect(() => {
@@ -359,6 +370,8 @@ export function LandingPage() {
               <input
                 name="email"
                 placeholder="Enter Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="placeholder-white outline-none text-white bg-inherit px-8"
               />
               <span>

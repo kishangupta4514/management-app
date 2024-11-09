@@ -404,6 +404,37 @@ app.get("/contact-form/:id", async (req, res) => {
   }
 });
 
+// Subscribe to newsletter
+app.post("/subscribe", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const newSubscription = await databases.createDocument(
+      process.env.APPWRITE_DATABASE_ID,
+      process.env.APPWRITE_SUBSCRIPTIONS_COLLECTION_ID,
+      ID.unique(),
+      { email }
+    );
+    res.status(201).json(newSubscription);
+  } catch (error) {
+    console.error("Error subscribing:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all subscribed emails (for admin)
+app.get("/subscriptions", async (req, res) => {
+  try {
+    const subscriptions = await databases.listDocuments(
+      process.env.APPWRITE_DATABASE_ID,
+      process.env.APPWRITE_SUBSCRIPTIONS_COLLECTION_ID
+    );
+    res.json(subscriptions.documents);
+  } catch (error) {
+    console.error("Error fetching subscriptions:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
