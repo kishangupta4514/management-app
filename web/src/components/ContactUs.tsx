@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
+
+const apiUrl = import.meta.env.VITE_API_URL;
 
 interface IUserData {
   fullName: string;
@@ -14,9 +17,36 @@ export function ContactUs() {
     mobile: null,
     location: "",
   });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle form submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
+    try {
+      const response = await axios.post(
+        `${apiUrl}/contact-form`,
+        userData
+      );
+      if (response.status !== 201) throw new Error();
+      setSuccessMessage("Your response has been recorded successfully!");
+      setUserData({
+        fullName: "",
+        email: "",
+        mobile: null,
+        location: "",
+      }); // Reset form after submission
+    } catch (error) {
+      setError("Failed to submit your contact form. Please try again.");
+      console.error("Error submitting contact form:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -35,46 +65,59 @@ export function ContactUs() {
           onSubmit={handleSubmit}
         >
           <input
-            className=" bg-transparent border-[1px] border-white rounded-md p-3 placeholder-white w-80 outline-none"
+            className="bg-transparent border-[1px] border-white rounded-md p-3 mx-auto placeholder-white w-80 outline-none"
             placeholder="Full Name"
+            value={userData.fullName}
             onChange={(e) =>
-              setUserData((prev) => {
-                return { ...prev, fullName: e.target.value };
-              })
+              setUserData((prev) => ({
+                ...prev,
+                fullName: e.target.value,
+              }))
             }
           />
           <input
-            className=" bg-transparent border-[1px] border-white rounded-md p-3 placeholder-white w-80 outline-none"
+            className="bg-transparent border-[1px] border-white rounded-md p-3 mx-auto placeholder-white w-80 outline-none"
             placeholder="Email Address"
+            value={userData.email}
             onChange={(e) =>
-              setUserData((prev) => {
-                return { ...prev, email: e.target.value };
-              })
+              setUserData((prev) => ({
+                ...prev,
+                email: e.target.value,
+              }))
             }
           />
           <input
-            className=" bg-transparent border-[1px] border-white rounded-md p-3 placeholder-white w-80 outline-none"
+            className="bg-transparent border-[1px] border-white rounded-md p-3 mx-auto placeholder-white w-80 outline-none"
             placeholder="Mobile Number"
+            value={userData.mobile ?? ""}
             onChange={(e) =>
-              setUserData((prev) => {
-                return { ...prev, mobile: parseInt(e.target.value) };
-              })
+              setUserData((prev) => ({
+                ...prev,
+                mobile: parseInt(e.target.value),
+              }))
             }
           />
           <input
-            className=" bg-transparent border-[1px] border-white rounded-md p-3 placeholder-white w-80 outline-none"
+            className="bg-transparent border-[1px] border-white rounded-md p-3 mx-auto placeholder-white w-80 outline-none"
             placeholder="Area, City"
+            value={userData.location}
             onChange={(e) =>
-              setUserData((prev) => {
-                return { ...prev, location: e.target.value };
-              })
+              setUserData((prev) => ({
+                ...prev,
+                location: e.target.value,
+              }))
             }
           />
+          {error && <p className="text-red-500 mx-auto -my-2 -mb-6">{error}</p>}
+          {successMessage && (
+            <p className="text-green-500 mx-auto -my-2 -mb-6">{successMessage}</p>
+          )}
           <button
             type="submit"
-            className="mt-6 uppercase font-[500] bg-[#f46d21] text-white px-auto py-3 rounded-md hover:opacity-70"
+            className="mt-6 mx-auto uppercase font-[500] bg-[#f46d21] text-white px-24 py-3 rounded-md hover:opacity-70"
+            disabled={loading}
           >
-            Get Quick Quote
+            {loading ? "Sending..." : "Get Quick Quote"}
           </button>
         </form>
       </div>

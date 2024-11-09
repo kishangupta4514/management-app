@@ -13,34 +13,10 @@ export function Navbar() {
         </div>
         <div>
           <Link
-            to="/services"
-            className="uppercase hover:opacity-70 font-[500]"
-          >
-            Services
-          </Link>
-        </div>
-        <div>
-          <Link
-            to="/projects"
-            className="uppercase hover:opacity-70 font-[500]"
-          >
-            About Projects
-          </Link>
-        </div>
-        <div>
-          <Link
-            to="/testimonials"
-            className="uppercase hover:opacity-70 font-[500]"
-          >
-            Testimonials
-          </Link>
-        </div>
-        <div>
-          <Link
             to="/contact"
             className="uppercase font-[500] bg-[#f46d21] text-white px-6 py-2 rounded-md hover:opacity-70"
           >
-            Contact
+            Login
           </Link>
         </div>
       </div>
