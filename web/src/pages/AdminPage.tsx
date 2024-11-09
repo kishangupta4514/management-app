@@ -51,7 +51,14 @@ export function Navbar() {
             </Link>
           </div>
         ) : (
-          ""
+          <div>
+            <button
+              onClick={() => auth.logout()}
+              className="uppercase font-[500] bg-[#f46d21] text-white px-6 py-2 rounded-md hover:opacity-70"
+            >
+              Logout
+            </button>
+          </div>
         )}
       </div>
     </div>

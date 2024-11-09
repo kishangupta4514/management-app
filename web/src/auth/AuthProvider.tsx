@@ -50,7 +50,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("token", newToken);
     setToken(newToken);
   };
-  const logout = () => setToken(null);
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null)};
 
   return (
     <AuthContext.Provider value={{ token, login, logout, verify }}>
