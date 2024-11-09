@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 
@@ -12,8 +12,16 @@ interface IClientData {
   imgUrl: string;
 }
 
+interface IClientFormData {
+  name: string;
+  description: string;
+  designation: string;
+  image: (string | Blob)[];
+}
+
+
 export function ClientManagement() {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<IClientFormData>();
   const [clients, setClients] = useState<IClientData[]>([]);
   const [editingClientId, setEditingClientId] = useState<string | null>(null);
 
@@ -54,7 +62,7 @@ export function ClientManagement() {
     }
   };
 
-  const handleClientUpdate = async (data: any, clientId: string) => {
+  const handleClientUpdate = async (data: IClientFormData, clientId: string) => {
     try {
       const formData = new FormData();
       formData.append("name", data.name);

@@ -12,8 +12,15 @@ interface IProjectData {
   location: string;
 }
 
+interface IProjectFormData {
+  name: string;
+  description: string;
+  location: string;
+  image: (string | Blob)[];
+}
+
 export function ProjectManagement() {
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset } = useForm<IProjectFormData>();
   const [projects, setProjects] = useState<IProjectData[]>([]);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
 
@@ -54,7 +61,10 @@ export function ProjectManagement() {
     }
   };
 
-  const handleProjectUpdate = async (data: any, projectId: string) => {
+  const handleProjectUpdate = async (
+    data: IProjectFormData,
+    projectId: string
+  ) => {
     try {
       const formData = new FormData();
       formData.append("name", data.name);
