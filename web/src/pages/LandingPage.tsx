@@ -391,10 +391,20 @@ export function LandingPage() {
             </div>
             <div className="flex gap-2">
               <div className="rounded-full p-1 bg-white text-center m-auto w-[30px] h-[30px]">
-                <img loading="lazy" src="/images/Group-1.svg" width={30} height={30} />
+                <img
+                  loading="lazy"
+                  src="/images/Group-1.svg"
+                  width={30}
+                  height={30}
+                />
               </div>
               <div className="rounded-full p-1 bg-white w-[30px] h-[30px]">
-                <img loading="lazy" src="/images/Group.svg" width={30} height={30}/>
+                <img
+                  loading="lazy"
+                  src="/images/Group.svg"
+                  width={30}
+                  height={30}
+                />
               </div>
               <div className="rounded-full p-1 bg-white">
                 <img loading="lazy" src="/images/Frame.svg" />
