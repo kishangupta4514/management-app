@@ -3,12 +3,15 @@ import { ProjectManagement } from "../components/ProjectManagement";
 import { ClientManagement } from "../components/ClientManagement";
 import { SubscriberList } from "../components/SubscriberList";
 import { ContactFormManagement } from "../components/ContactFormManagement";
+import { useAuth } from "../auth/AuthProvider";
+// import { AdminLogin } from "../components/Login";
 
 export function AdminPage() {
   return (
     <div>
       <Navbar />
       <div className="flex flex-col gap-8 mt-10 p-5">
+        {/* <AdminLogin /> */}
         <div className="pb-16">
           <ProjectManagement />
         </div>
@@ -26,6 +29,7 @@ export function AdminPage() {
   );
 }
 export function Navbar() {
+  const auth = useAuth();
   return (
     <div className="flex justify-between px-32 tracking-tight py-1">
       <Link to="/" className="py-2">
@@ -37,14 +41,18 @@ export function Navbar() {
             Home
           </Link>
         </div>
-        <div>
-          <Link
-            to="/contact"
-            className="uppercase font-[500] bg-[#f46d21] text-white px-6 py-2 rounded-md hover:opacity-70"
-          >
-            Login
-          </Link>
-        </div>
+        {!auth || !auth.token ? (
+          <div>
+            <Link
+              to="/login"
+              className="uppercase font-[500] bg-[#f46d21] text-white px-6 py-2 rounded-md hover:opacity-70"
+            >
+              Login
+            </Link>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ interface IClientData {
 export function LandingPage() {
   const [clientsData, setClientsData] = useState<IClientData[]>([]);
   const [propertyData, setProperyData] = useState<IProjectData[]>([]);
+  const [email, setEmail] = useState<string>("");
 
   const fetchClientsData = async () => {
     try {
@@ -54,8 +55,18 @@ export function LandingPage() {
     }
   };
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
+    try {
+      await axios.post(`${apiUrl}/subscribe`, {
+        email,
+      });
+      alert("Subscribed...");
+      setEmail("");
+    } catch (error) {
+      alert("Failed to subscribe...");
+      console.error("Error subscribing:", error);
+    }
   };
 
   useEffect(() => {
@@ -359,6 +370,8 @@ export function LandingPage() {
               <input
                 name="email"
                 placeholder="Enter Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="placeholder-white outline-none text-white bg-inherit px-8"
               />
               <span>
@@ -377,11 +390,21 @@ export function LandingPage() {
               <img loading="lazy" src="/icons/logo.svg" className="h-[40px]" />
             </div>
             <div className="flex gap-2">
-              <div className="rounded-full p-1 bg-white text-center m-auto">
-                <img loading="lazy" src="/images/Group-1.svg" />
+              <div className="rounded-full p-1 bg-white text-center m-auto w-[30px] h-[30px]">
+                <img
+                  loading="lazy"
+                  src="/images/Group-1.svg"
+                  width={30}
+                  height={30}
+                />
               </div>
-              <div className="rounded-full p-1 bg-white">
-                <img loading="lazy" src="/images/Group.svg" />
+              <div className="rounded-full p-1 bg-white w-[30px] h-[30px]">
+                <img
+                  loading="lazy"
+                  src="/images/Group.svg"
+                  width={30}
+                  height={30}
+                />
               </div>
               <div className="rounded-full p-1 bg-white">
                 <img loading="lazy" src="/images/Frame.svg" />

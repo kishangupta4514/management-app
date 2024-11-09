@@ -12,6 +12,8 @@ import { InputFile } from "node-appwrite/file";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 dotenv.config();
 
@@ -31,6 +33,43 @@ client
 const storageService = new Storage(client);
 const databases = new Databases(client);
 
+const adminCredentials = {
+  email: process.env.ADMIN_EMAIL,
+  password: process.env.ADMIN_PASSWORD, // hashed password from bcrypt.hashSync("yourpassword", 10)
+};
+
+const generateToken = (email) => {
+  return jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+};
+
+app.post("/admin/login", async (req, res) => {
+  const { email, password } = req.body;
+  console.log({ email, password });
+
+  if (
+    email === adminCredentials.email &&
+    bcrypt.compareSync(password, adminCredentials.password)
+  ) {
+    const token = generateToken(email);
+    res.json({ token });
+  } else {
+    res.status(401).json({ error: "Invalid credentials" });
+  }
+});
+
+// Middleware to verify JWT
+const verifyToken = (req, res, next) => {
+  const token = req.headers["authorization"];
+  console.log({ token });
+  if (!token) return res.status(403).json({ error: "No token provided" });
+
+  jwt.verify(token.split(" ")[1], process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(401).json({ error: "Unauthorized" });
+    req.adminEmail = decoded.email;
+    next();
+  });
+};
+
 // Multer setup for in-memory file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -43,7 +82,7 @@ const upload = multer({
 });
 
 // ----------- CLIENT ROUTES -----------
-app.post("/clients", upload.single("image"), async (req, res) => {
+app.post("/clients", upload.single("image"), verifyToken, async (req, res) => {
   try {
     const { name, description, designation } = req.body;
     const file = req.file;
@@ -124,43 +163,48 @@ app.get("/clients/:id", async (req, res) => {
   }
 });
 
-app.put("/clients/:id", upload.single("image"), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, description, designation } = req.body;
-    let imgUrl = req.body.imgUrl;
+app.put(
+  "/clients/:id",
+  verifyToken,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, description, designation } = req.body;
+      let imgUrl = req.body.imgUrl;
 
-    // If a new file is provided, upload it and replace the imgUrl
-    if (req.file) {
-      const fileUpload = await storageService.createFile(
-        process.env.APPWRITE_STORAGE_BUCKET_ID,
-        ID.unique(),
-        InputFile.fromBuffer(req.file.buffer, req.file.originalname),
-        [
-          Permission.read(Role.any()),
-          Permission.update(Role.any()),
-          Permission.delete(Role.any()),
-        ]
+      // If a new file is provided, upload it and replace the imgUrl
+      if (req.file) {
+        const fileUpload = await storageService.createFile(
+          process.env.APPWRITE_STORAGE_BUCKET_ID,
+          ID.unique(),
+          InputFile.fromBuffer(req.file.buffer, req.file.originalname),
+          [
+            Permission.read(Role.any()),
+            Permission.update(Role.any()),
+            Permission.delete(Role.any()),
+          ]
+        );
+        imgUrl = `${process.env.APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_STORAGE_BUCKET_ID}/files/${fileUpload.$id}/view?project=${process.env.APPWRITE_PROJECT_ID}`;
+      }
+
+      const updatedClient = await databases.updateDocument(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_COLLECTION_ID,
+        id,
+        { name, description, designation, imgUrl }
       );
-      imgUrl = `${process.env.APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_STORAGE_BUCKET_ID}/files/${fileUpload.$id}/view?project=${process.env.APPWRITE_PROJECT_ID}`;
+
+      res.json(updatedClient);
+    } catch (error) {
+      console.error("Error updating client:", error);
+      res.status(500).json({ error: error.message });
     }
-
-    const updatedClient = await databases.updateDocument(
-      process.env.APPWRITE_DATABASE_ID,
-      process.env.APPWRITE_COLLECTION_ID,
-      id,
-      { name, description, designation, imgUrl }
-    );
-
-    res.json(updatedClient);
-  } catch (error) {
-    console.error("Error updating client:", error);
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 // Delete a client
-app.delete("/clients/:id", async (req, res) => {
+app.delete("/clients/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     await databases.deleteDocument(
@@ -177,7 +221,7 @@ app.delete("/clients/:id", async (req, res) => {
 
 // ----------- PROJECT ROUTES -----------
 // Create a new project
-app.post("/projects", upload.single("image"), async (req, res) => {
+app.post("/projects", verifyToken, upload.single("image"), async (req, res) => {
   try {
     const { name, description, location } = req.body;
     const file = req.file;
@@ -259,42 +303,47 @@ app.get("/projects/:id", async (req, res) => {
 });
 
 // Update a project by ID
-app.put("/projects/:id", upload.single("image"), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { name, description, location } = req.body;
-    let imgUrl = req.body.imgUrl;
+app.put(
+  "/projects/:id",
+  verifyToken,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, description, location } = req.body;
+      let imgUrl = req.body.imgUrl;
 
-    if (req.file) {
-      const fileUpload = await storageService.createFile(
-        process.env.APPWRITE_STORAGE_BUCKET_ID,
-        ID.unique(),
-        InputFile.fromBuffer(req.file.buffer, req.file.originalname),
-        [
-          Permission.read(Role.any()),
-          Permission.update(Role.any()),
-          Permission.delete(Role.any()),
-        ]
+      if (req.file) {
+        const fileUpload = await storageService.createFile(
+          process.env.APPWRITE_STORAGE_BUCKET_ID,
+          ID.unique(),
+          InputFile.fromBuffer(req.file.buffer, req.file.originalname),
+          [
+            Permission.read(Role.any()),
+            Permission.update(Role.any()),
+            Permission.delete(Role.any()),
+          ]
+        );
+        imgUrl = `${process.env.APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_STORAGE_BUCKET_ID}/files/${fileUpload.$id}/view?project=${process.env.APPWRITE_PROJECT_ID}`;
+      }
+
+      const updatedProject = await databases.updateDocument(
+        process.env.APPWRITE_DATABASE_ID,
+        process.env.APPWRITE_PROJECTS_COLLECTION_ID,
+        id,
+        { name, description, imgUrl, location }
       );
-      imgUrl = `${process.env.APPWRITE_ENDPOINT}/storage/buckets/${process.env.APPWRITE_STORAGE_BUCKET_ID}/files/${fileUpload.$id}/view?project=${process.env.APPWRITE_PROJECT_ID}`;
+
+      res.json(updatedProject);
+    } catch (error) {
+      console.error("Error updating project:", error);
+      res.status(500).json({ error: error.message });
     }
-
-    const updatedProject = await databases.updateDocument(
-      process.env.APPWRITE_DATABASE_ID,
-      process.env.APPWRITE_PROJECTS_COLLECTION_ID,
-      id,
-      { name, description, imgUrl, location }
-    );
-
-    res.json(updatedProject);
-  } catch (error) {
-    console.error("Error updating project:", error);
-    res.status(500).json({ error: error.message });
   }
-});
+);
 
 // Delete a project by ID
-app.delete("/projects/:id", async (req, res) => {
+app.delete("/projects/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     await databases.deleteDocument(
@@ -375,7 +424,7 @@ app.post("/contact-form", async (req, res) => {
 });
 
 // Get all contact form responses
-app.get("/contact-form", async (req, res) => {
+app.post("/get-contact-forms", verifyToken, async (req, res) => {
   try {
     const contactFormResponses = await databases.listDocuments(
       process.env.APPWRITE_DATABASE_ID,
@@ -389,7 +438,7 @@ app.get("/contact-form", async (req, res) => {
 });
 
 // Get a contact form response by ID
-app.get("/contact-form/:id", async (req, res) => {
+app.post("/contact-form/:id", verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     const contactFormResponse = await databases.getDocument(
@@ -402,6 +451,41 @@ app.get("/contact-form/:id", async (req, res) => {
     console.error("Error fetching contact form response:", error);
     res.status(500).json({ error: error.message });
   }
+});
+
+// Subscribe to newsletter
+app.post("/subscribe", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const newSubscription = await databases.createDocument(
+      process.env.APPWRITE_DATABASE_ID,
+      process.env.APPWRITE_SUBSCRIPTIONS_COLLECTION_ID,
+      ID.unique(),
+      { email }
+    );
+    res.status(201).json(newSubscription);
+  } catch (error) {
+    console.error("Error subscribing:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all subscribed emails (for admin)
+app.post("/get-subscriptions", verifyToken, async (req, res) => {
+  try {
+    const subscriptions = await databases.listDocuments(
+      process.env.APPWRITE_DATABASE_ID,
+      process.env.APPWRITE_SUBSCRIPTIONS_COLLECTION_ID
+    );
+    res.json(subscriptions.documents);
+  } catch (error) {
+    console.error("Error fetching subscriptions:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/verify", verifyToken, async (req, res) => {
+  res.sendStatus(200);
 });
 
 app.listen(port, () => {

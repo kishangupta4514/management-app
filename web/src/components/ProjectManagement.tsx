@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useForm } from "react-hook-form";
+import { useAuth } from "../auth/AuthProvider";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -23,6 +24,7 @@ export function ProjectManagement() {
   const { register, handleSubmit, reset } = useForm<IProjectFormData>();
   const [projects, setProjects] = useState<IProjectData[]>([]);
   const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
+  const auth = useAuth();
 
   useEffect(() => {
     fetchProjects();
@@ -51,7 +53,10 @@ export function ProjectManagement() {
       formData.append("image", data.image[0]);
 
       const response = await axios.post(`${apiUrl}/projects`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${auth?.token}`,
+        },
       });
 
       setProjects([...projects, response.data.project]);
@@ -82,7 +87,12 @@ export function ProjectManagement() {
       const response = await axios.put(
         `${apiUrl}/projects/${projectId}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${auth?.token}`,
+          },
+        }
       );
 
       setProjects(
@@ -114,7 +124,9 @@ export function ProjectManagement() {
 
   const handleDeleteProject = async (id: string) => {
     try {
-      await axios.delete(`${apiUrl}/projects/${id}`);
+      await axios.delete(`${apiUrl}/projects/${id}`, {
+        headers: { Authorization: `Bearer ${auth?.token}` },
+      });
       setProjects(projects.filter((project) => project.$id !== id));
     } catch (error) {
       console.error("Error deleting project:", error);
