@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuth } from "../auth/AuthProvider";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -12,11 +13,16 @@ export function SubscriberList() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const auth = useAuth();
 
   useEffect(() => {
     const fetchSubscriptions = async () => {
       try {
-        const response = await axios.get(`${apiUrl}/subscriptions`);
+        const response = await axios.post(
+          `${apiUrl}/get-subscriptions`,
+          {},
+          { headers: { Authorization: `Bearer ${auth?.token}` } }
+        );
         setSubscriptions(response.data);
       } catch (error) {
         setError("Failed to fetch subscriptions.");

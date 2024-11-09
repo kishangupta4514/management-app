@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../auth/AuthProvider";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -15,8 +16,11 @@ export function ContactFormManagement() {
   const [contactFormResponses, setContactFormResponses] = useState<
     IContactFormResponse[]
   >([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const auth = useAuth();
+
+  console.log(auth)
 
   useEffect(() => {
     // Fetch contact form responses when the component mounts
@@ -27,7 +31,16 @@ export function ContactFormManagement() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${apiUrl}/contact-form`);
+      const response = await axios.post(
+        `${apiUrl}/get-contact-forms`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${auth?.token}`,
+          },
+        }
+      );
       setContactFormResponses(response.data.documents || []);
     } catch (err) {
       setError("Failed to fetch contact form responses.");
@@ -83,7 +96,9 @@ export function ContactFormManagement() {
                     <td className="px-4 py-2 text-gray-800">
                       {response.mobile}
                     </td>
-                    <td className="px-4 py-2 text-gray-800">{response.location}</td>
+                    <td className="px-4 py-2 text-gray-800">
+                      {response.location}
+                    </td>
                   </tr>
                 ))
               )}
