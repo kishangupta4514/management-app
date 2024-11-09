@@ -4,11 +4,11 @@ interface IData {
   name: string;
   location: string;
 }
-export function PropertyCard({ data }: { data: IData }) {
+export function ProjectCard({ data }: { data: IData }) {
   return (
-    <div className="w-[350px] h-[550px] bg-white rounded-t-2xl overflow-hidden">
-      <div>
-        <img src={data.imgUrl} width={450} />
+    <div className="w-[350px] h-[540px] bg-white rounded-t-2xl overflow-hidden">
+      <div className="w-[450px] h-[350px] overflow-hidden">
+        <img src={data.imgUrl} width={450} height={350} />
       </div>
       <div className="pl-5">
         <div className="text-xl font-bold mt-5 text-sky-700">
