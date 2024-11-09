@@ -34,8 +34,8 @@ const storageService = new Storage(client);
 const databases = new Databases(client);
 
 const adminCredentials = {
-  email: "admin@example.com",
-  password: "$2b$10$N5VJEFoi/qoTMliDunMVjew6hnG90onwMoVSLrKRYpf04/p4Md.Ta", // hashed password from bcrypt.hashSync("yourpassword", 10)
+  email: process.env.ADMIN_EMAIL,
+  password: process.env.ADMIN_PASSWORD, // hashed password from bcrypt.hashSync("yourpassword", 10)
 };
 
 const generateToken = (email) => {

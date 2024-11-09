@@ -23,8 +23,8 @@ export function ContactFormManagement() {
   console.log(auth)
 
   useEffect(() => {
-    // Fetch contact form responses when the component mounts
     fetchContactFormResponses();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchContactFormResponses = async () => {
