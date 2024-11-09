@@ -33,6 +33,7 @@ export function SubscriberList() {
     };
 
     fetchSubscriptions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (error) return <p className="error">{error}</p>;
